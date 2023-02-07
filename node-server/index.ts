@@ -11,7 +11,11 @@ const server = http.createServer()
 server.on('request', (request: IncomingMessage, response: ServerResponse) => {
   // 根据url返回不同的文件
   const requestUrl = request.url || ''
-  const pathname = url.parse(requestUrl).pathname || ''
+  let pathname = url.parse(requestUrl).pathname || ''
+  // 如果是根路径，返回index.html
+  if (pathname === '/') {
+    pathname = '/index.html'
+  }
   if (/\.html$/.test(pathname)) {
     response.setHeader('content-type', 'text/html;charset=utf-8')
   } else if (/\.js$/.test(pathname)) {
@@ -24,7 +28,7 @@ server.on('request', (request: IncomingMessage, response: ServerResponse) => {
       response.statusCode = 404
       response.end()
     } else {
-      response.end(data.toString())
+      response.end(data)
     }
   })
 })
