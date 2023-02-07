@@ -1,29 +1,29 @@
 
 import * as http from "http"
-import { Buffer } from 'buffer'
+import * as fs from "fs"
+import * as path from "path"
 import { IncomingMessage, ServerResponse } from 'http'
 
+const publicDir = path.resolve(__dirname, 'public')
 const server = http.createServer()
 
 server.on("request", (request: IncomingMessage, response: ServerResponse) => {
-  console.log("request received")
-  console.log(request.method)
-  console.log(request.url)
-  console.log(request.headers)
-  // get post data
-  const postData: Buffer | string | any = []
-  request.on('data', chunk => {
-    postData.push(chunk);
-  })
-  request.on('end', () => {
-    const body = Buffer.concat(postData).toString();
-    console.log(body)
-    response.setHeader('Content-Type', 'application/json')
-    response.statusCode = 404
-    response.write('404 Not Found\n')
-    response.end(JSON.stringify({
-      data: 'Hello World!'
-    }))
+  // 根据url返回不同的文件
+  const { url = '' } = request
+  if (/\.html$/.test(url)) {
+    response.setHeader('content-type', 'text/html;charset=utf-8')
+  } else if (/\.js$/.test(url)) {
+    response.setHeader('content-type', 'text/javascript;charset=utf-8')
+  } else if (/\.css$/.test(url)) {
+    response.setHeader('content-type', 'text/css;charset=utf-8')
+  }
+  fs.readFile(path.resolve(publicDir, url.slice(1)), (err, data) => {
+    if (err) {
+      response.statusCode = 404
+      response.end()
+    } else {
+      response.end(data.toString())
+    }
   })
 })
 
