@@ -28,6 +28,7 @@ server.on('request', (request: IncomingMessage, response: ServerResponse) => {
       response.statusCode = 404
       response.end()
     } else {
+      response.setHeader('Cache-Control', 'public, max-age=31536000')
       response.end(data)
     }
   })
