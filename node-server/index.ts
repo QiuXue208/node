@@ -11,6 +11,12 @@ const server = http.createServer()
 server.on('request', (request: IncomingMessage, response: ServerResponse) => {
   // 根据url返回不同的文件
   const requestUrl = request.url || ''
+  const method = request.method
+  if (method !== 'GET') {
+    response.statusCode = 405
+    response.end('Method Not Allowed')
+    return
+  }
   let pathname = url.parse(requestUrl).pathname || ''
   // 如果是根路径，返回index.html
   if (pathname === '/') {
